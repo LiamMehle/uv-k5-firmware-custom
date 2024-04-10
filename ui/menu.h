@@ -32,6 +32,9 @@ typedef struct {
 enum
 {
 	MENU_SQL = 0,
+#ifdef LNAS
+	MENU_LNAS,
+#endif
 	MENU_STEP,
 	MENU_TXP,
 	MENU_R_DCS,

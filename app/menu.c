@@ -48,6 +48,30 @@
 
 uint8_t gUnlockAllTxConfCnt;
 
+#ifdef LNAS
+uint16_t GetRegMenuValue(RegisterSpec s) {
+	return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
+}
+uint16_t GetRegMenuValue(RegisterSpec s) {
+  return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
+}
+void SetLNAs(uint8_t newValue) {
+	RegisterSpec registerSpec = {"LNAs", BK4819_REG_13, 8, 0b11, 1};
+	uint16_t v = GetRegMenuValue(registerSpec);    // current register value
+	RegisterSpec s = registerSpecs[st];  // register to increment/decrement
+
+	if(s.num == BK4819_REG_13)
+		void RADIO_SetupAGC(false, true);  // no AM, disable AGC
+
+	v = newValue;
+	uint16_t reg = BK4819_ReadRegister(s.num);
+  // TODO: use max value for bits count in max value, or reset by additional
+  // mask in spec
+	reg &= ~(s.mask << s.offset);
+	BK4819_WriteRegister(s.num, reg | (v << s.offset));
+}
+#endif
+
 #ifdef ENABLE_F_CAL_MENU
 	void writeXtalFreqCal(const int32_t value, const bool update_eeprom)
 	{
@@ -115,6 +139,13 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 {
 	switch (menu_id)
 	{
+#ifdef LNAS
+		case MENU_LNAS:
+			*pMin = 0;
+			*pMax = 3;
+			break;
+#endif
+
 		case MENU_SQL:
 			*pMin = 0;
 			*pMax = 9;
@@ -369,7 +400,6 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 
 	return 0;
 }
-
 void MENU_AcceptSetting(void)
 {
 	int32_t        Min;
@@ -388,6 +418,11 @@ void MENU_AcceptSetting(void)
 		default:
 			return;
 
+#ifdef LNAS
+		case MENU_LNAS:
+			SetLNAs(gSubMenuSelection);
+			break;
+#endif
 		case MENU_SQL:
 			gEeprom.SQUELCH_LEVEL = gSubMenuSelection;
 			gVfoConfigureMode     = VFO_CONFIGURE;

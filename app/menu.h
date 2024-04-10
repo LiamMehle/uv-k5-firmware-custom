@@ -34,5 +34,18 @@ void MENU_StopCssScan(void);
 
 void MENU_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 
+#ifdef LNAS
+typedef struct {
+  const char *name;
+  uint8_t num;
+  uint8_t offset;
+  uint16_t mask;
+  uint16_t inc;
+} RegisterSpec;
+
+uint16_t GetRegMenuValue(RegisterSpec s);
+uint16_t GetRegMenuValue(RegisterSpec s);
+void SetLNAs(uint8_t newValue);
+#endif
 #endif
 
