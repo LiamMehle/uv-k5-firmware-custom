@@ -122,8 +122,12 @@ const t_menu_item MenuList[] =
 #endif
 	{"BatVol", VOICE_ID_INVALID,                       MENU_VOL           }, // was "VOL"
 	{"RxMode", VOICE_ID_DUAL_STANDBY,                  MENU_TDR           },
-#ifdef LNAS
+#ifdef LNAS  // labels
+	{"AGC",    VOICE_ID_INVALID,                       MENU_AGC           },
 	{"LNAs",   VOICE_ID_INVALID,                       MENU_LNAS          },
+	{"LNA",    VOICE_ID_INVALID,                       MENU_LNA           },
+	{"MIXER",  VOICE_ID_INVALID,                       MENU_MIXER         },
+	{"PGO",    VOICE_ID_INVALID,                       MENU_PGO           },
 #endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 
@@ -336,6 +340,39 @@ const char gSubMenu_SCRAMBLER[][7] =
 	"3400Hz",
 	"3500Hz"
 };
+#ifdef LNAS
+static int8_t LNAsGainTable[] = {
+	-24,
+	-30,
+	-33
+};
+static int8_t LNAGainTable[] = {
+	0,
+	-2,
+	-4,
+	-6,
+	-9,
+	-14,
+	-19,
+	-24
+};
+static int8_t MixerGainTable[] = {
+	0,
+	-3,
+	-6,
+	-8
+};
+static int8_t PGAGainTable[] = {
+	0,
+	-3,
+	-6,
+	-9,
+	-15,
+	-21,
+	-27,
+	-33
+};
+#endif
 
 const t_sidefunction gSubMenu_SIDEFUNCTIONS[] =
 {
@@ -495,13 +532,21 @@ void UI_DisplayMenu(void)
 
 	switch (UI_MENU_GetCurrentMenuId())
 	{
-#ifdef LNAS
+#ifdef LNAS  // display code
+		case MENU_AGC:
+			sprintf(String, "%s", gSubMenuSelection ? "Off" : "Auto");
+			break;
 		case MENU_LNAS:
-			{
-				RegisterSpec registerSpec = {"LNAs", BK4819_REG_13, 8, 0b11, 1};
-				gSubMenuSelection = GetRegMenuValue(registerSpec);
-				sprintf(String, "%d", gSubMenuSelection);
-			}
+			sprintf(String, "%d (%ddB)", gSubMenuSelection, LNAsGainTable[gSubMenuSelection]);
+			break;
+		case MENU_LNA:
+			sprintf(String, "%d (%ddB)", gSubMenuSelection, LNAGainTable[gSubMenuSelection]);
+			break;
+		case MENU_MIXER:
+				sprintf(String, "%d (%ddB)", gSubMenuSelection, MixerGainTable[gSubMenuSelection]);
+			break;
+		case MENU_PGO:
+				sprintf(String, "%d (%ddB)", gSubMenuSelection, PGAGainTable[gSubMenuSelection]);
 			break;
 #endif
 

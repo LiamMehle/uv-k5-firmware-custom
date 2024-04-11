@@ -121,10 +121,9 @@ static uint16_t GetRegMenuValue(uint8_t st) {
   return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
 }
 
-void LockAGC()
-{
-  RADIO_SetupAGC(settings.modulationType==MODULATION_AM, lockAGC);
+void LockAGC() {
   lockAGC = true;
+  RADIO_SetupAGC(settings.modulationType==MODULATION_AM, lockAGC);
 }
 
 static void SetRegMenuValue(uint8_t st, bool add) {

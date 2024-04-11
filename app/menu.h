@@ -34,18 +34,13 @@ void MENU_StopCssScan(void);
 
 void MENU_ProcessKeys(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld);
 
-#ifdef LNAS
-typedef struct {
-  const char *name;
-  uint8_t num;
-  uint8_t offset;
-  uint16_t mask;
-  uint16_t inc;
-} RegisterSpec;
+#ifdef LNAS  // header definitions
+#include "../driver/bk4819-regs.h"
+#include <stdint.h>
 
-uint16_t GetRegMenuValue(RegisterSpec s);
-uint16_t GetRegMenuValue(RegisterSpec s);
-void SetLNAs(uint8_t newValue);
+bool GetAGC();
+uint16_t GetRegisterValue(RegisterSpec s);
+void SetRegisterValue(RegisterSpec s, uint8_t newValue);
 #endif
 #endif
 

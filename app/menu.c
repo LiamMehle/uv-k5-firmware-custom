@@ -46,29 +46,27 @@
 	#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 #endif
 
+#ifdef LNAS
+static const RegisterSpec LNAS_REGISTER_SPEC = {0, BK4819_REG_13,  8,   0b11,  1};
+static const RegisterSpec LNA_REGISTER_SPEC  = {0, BK4819_REG_13,  5,   0b111, 1};
+static const RegisterSpec MIXER_REGISTER_SPEC = {0, BK4819_REG_13, 3,   0b11,  1};
+static const RegisterSpec PGO_REGISTER_SPEC  = {0, BK4819_REG_13,  0,   0b111, 1};
+#endif
+
 uint8_t gUnlockAllTxConfCnt;
 
-#ifdef LNAS
-uint16_t GetRegMenuValue(RegisterSpec s) {
-	return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
+#ifdef LNAS  // convenience functions
+bool GetAGC() {
+	uint16_t regVal = BK4819_ReadRegister(BK4819_REG_7E);
+	return !(regVal & (1 << 15));
 }
-uint16_t GetRegMenuValue(RegisterSpec s) {
-  return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
-}
-void SetLNAs(uint8_t newValue) {
-	RegisterSpec registerSpec = {"LNAs", BK4819_REG_13, 8, 0b11, 1};
-	uint16_t v = GetRegMenuValue(registerSpec);    // current register value
-	RegisterSpec s = registerSpecs[st];  // register to increment/decrement
-
-	if(s.num == BK4819_REG_13)
-		void RADIO_SetupAGC(false, true);  // no AM, disable AGC
-
-	v = newValue;
+void SetRegisterValue(RegisterSpec s, uint8_t newValue) {
 	uint16_t reg = BK4819_ReadRegister(s.num);
-  // TODO: use max value for bits count in max value, or reset by additional
-  // mask in spec
 	reg &= ~(s.mask << s.offset);
-	BK4819_WriteRegister(s.num, reg | (v << s.offset));
+	BK4819_WriteRegister(s.num, reg | (newValue << s.offset));
+}
+uint16_t GetRegisterValue(RegisterSpec s) {
+	return (BK4819_ReadRegister(s.num) >> s.offset) & s.mask;
 }
 #endif
 
@@ -139,10 +137,26 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 {
 	switch (menu_id)
 	{
-#ifdef LNAS
+#ifdef LNAS  // min - max values
 		case MENU_LNAS:
 			*pMin = 0;
 			*pMax = 3;
+			break;
+		case MENU_LNA:
+			*pMin = 0;
+			*pMax = 7;
+			break;
+		case MENU_MIXER:
+			*pMin = 0;
+			*pMax = 7;
+			break;
+		case MENU_PGO:
+			*pMin = 0;
+			*pMax = 7;
+			break;
+		case MENU_AGC:
+			*pMin = 0;
+			*pMax = 1;
 			break;
 #endif
 
@@ -418,9 +432,21 @@ void MENU_AcceptSetting(void)
 		default:
 			return;
 
-#ifdef LNAS
+#ifdef LNAS  // writing values
+		case MENU_AGC:
+			BK4819_SetAGC(gSubMenuSelection == 1);
+			break;
 		case MENU_LNAS:
-			SetLNAs(gSubMenuSelection);
+			SetRegisterValue(LNAS_REGISTER_SPEC,  gSubMenuSelection);
+			break;
+		case MENU_LNA:
+			SetRegisterValue(LNA_REGISTER_SPEC, gSubMenuSelection);
+			break;
+		case MENU_MIXER:
+			SetRegisterValue(MIXER_REGISTER_SPEC, gSubMenuSelection);
+			break;
+		case MENU_PGO:
+			SetRegisterValue(PGO_REGISTER_SPEC, gSubMenuSelection);
 			break;
 #endif
 		case MENU_SQL:
@@ -856,6 +882,23 @@ void MENU_ShowCurrentSetting(void)
 {
 	switch (UI_MENU_GetCurrentMenuId())
 	{
+#ifdef LNAS  // recalling values
+		case MENU_AGC:
+			gSubMenuSelection = GetAGC();
+			break;
+		case MENU_LNAS:
+			gSubMenuSelection = GetRegisterValue(LNAS_REGISTER_SPEC);
+			break;
+		case MENU_LNA:
+			gSubMenuSelection = GetRegisterValue(LNA_REGISTER_SPEC);
+			break;
+		case MENU_MIXER:
+			gSubMenuSelection = GetRegisterValue(MIXER_REGISTER_SPEC);
+			break;
+		case MENU_PGO:
+			gSubMenuSelection = GetRegisterValue(PGO_REGISTER_SPEC);
+			break;
+#endif
 		case MENU_SQL:
 			gSubMenuSelection = gEeprom.SQUELCH_LEVEL;
 			break;
