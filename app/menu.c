@@ -148,7 +148,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			break;
 		case MENU_MIXER:
 			*pMin = 0;
-			*pMax = 7;
+			*pMax = 3;
 			break;
 		case MENU_PGO:
 			*pMin = 0;

@@ -340,37 +340,37 @@ const char gSubMenu_SCRAMBLER[][7] =
 	"3400Hz",
 	"3500Hz"
 };
-#ifdef LNAS
+#ifdef LNAS  // display tables
 static int8_t LNAsGainTable[] = {
-	-24,
+	-33,
 	-30,
-	-33
-};
-static int8_t LNAGainTable[] = {
-	0,
-	-2,
-	-4,
-	-6,
-	-9,
-	-14,
-	-19,
 	-24
 };
-static int8_t MixerGainTable[] = {
-	0,
-	-3,
+static int8_t LNAGainTable[] = {
+	-24,
+	-19,
+	-14,
+	-9,
 	-6,
-	-8
+	-4,
+	-2,
+	0
+};
+static int8_t MixerGainTable[] = {
+	-8,
+	-6,
+	-3,
+	0
 };
 static int8_t PGAGainTable[] = {
-	0,
-	-3,
-	-6,
-	-9,
-	-15,
-	-21,
+	-33,
 	-27,
-	-33
+	-21,
+	-15,
+	-9,
+	-6,
+	-3,
+	0
 };
 #endif
 
