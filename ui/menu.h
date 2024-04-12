@@ -37,7 +37,10 @@ enum
 	MENU_LNAS,
 	MENU_LNA,
 	MENU_MIXER,
-	MENU_PGO,
+	MENU_PGA,
+#endif
+#ifdef EXTENDED_QRP
+	MENU_PA_BIAS,
 #endif
 	MENU_STEP,
 	MENU_TXP,

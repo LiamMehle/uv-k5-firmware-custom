@@ -127,7 +127,10 @@ const t_menu_item MenuList[] =
 	{"LNAs",   VOICE_ID_INVALID,                       MENU_LNAS          },
 	{"LNA",    VOICE_ID_INVALID,                       MENU_LNA           },
 	{"MIXER",  VOICE_ID_INVALID,                       MENU_MIXER         },
-	{"PGO",    VOICE_ID_INVALID,                       MENU_PGO           },
+	{"PGA",    VOICE_ID_INVALID,                       MENU_PGA           },
+#endif
+#ifdef EXTENDED_QRP
+	{"PA bias",VOICE_ID_INVALID,                       MENU_PA_BIAS       },
 #endif
 	{"Sql",    VOICE_ID_SQUELCH,                       MENU_SQL           },
 
@@ -372,6 +375,9 @@ static int8_t PGAGainTable[] = {
 	-3,
 	0
 };
+static void FormatGainFromLookupTable(char* String, int8_t* lookupTable, int32_t selection) {
+	sprintf(String, "total:%ddB\n%d (%ddB)", BK4819_GetRxGain_dB(), selection, lookupTable[gSubMenuSelection]);
+}
 #endif
 
 const t_sidefunction gSubMenu_SIDEFUNCTIONS[] =
@@ -537,19 +543,23 @@ void UI_DisplayMenu(void)
 			sprintf(String, "%s", gSubMenuSelection ? "Off" : "Auto");
 			break;
 		case MENU_LNAS:
-			sprintf(String, "%d (%ddB)", gSubMenuSelection, LNAsGainTable[gSubMenuSelection]);
+			FormatGainFromLookupTable(String, LNAsGainTable, gSubMenuSelection);
 			break;
 		case MENU_LNA:
-			sprintf(String, "%d (%ddB)", gSubMenuSelection, LNAGainTable[gSubMenuSelection]);
+			FormatGainFromLookupTable(String, LNAGainTable, gSubMenuSelection);
 			break;
 		case MENU_MIXER:
-				sprintf(String, "%d (%ddB)", gSubMenuSelection, MixerGainTable[gSubMenuSelection]);
+			FormatGainFromLookupTable(String, MixerGainTable, gSubMenuSelection);
 			break;
-		case MENU_PGO:
-				sprintf(String, "%d (%ddB)", gSubMenuSelection, PGAGainTable[gSubMenuSelection]);
+		case MENU_PGA:
+			FormatGainFromLookupTable(String, PGAGainTable, gSubMenuSelection);
 			break;
 #endif
-
+#ifdef EXTENDED_QRP
+		case MENU_PA_BIAS:
+			sprintf(String, "%d/%d", gSubMenuSelection, gCurrentVfo->TXP_MaxSetting);
+			break;
+#endif
 		case MENU_SQL:
 			sprintf(String, "%d", gSubMenuSelection);
 			break;

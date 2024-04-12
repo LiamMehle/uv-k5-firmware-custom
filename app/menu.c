@@ -150,7 +150,7 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMin = 0;
 			*pMax = 3;
 			break;
-		case MENU_PGO:
+		case MENU_PGA:
 			*pMin = 0;
 			*pMax = 7;
 			break;
@@ -159,7 +159,12 @@ int MENU_GetLimits(uint8_t menu_id, int32_t *pMin, int32_t *pMax)
 			*pMax = 1;
 			break;
 #endif
-
+#ifdef EXTENDED_QRP
+		case MENU_PA_BIAS:
+			*pMin = 0;
+			*pMax = gCurrentVfo->TXP_MaxSetting;
+			break;
+#endif
 		case MENU_SQL:
 			*pMin = 0;
 			*pMax = 9;
@@ -445,8 +450,13 @@ void MENU_AcceptSetting(void)
 		case MENU_MIXER:
 			SetRegisterValue(MIXER_REGISTER_SPEC, gSubMenuSelection);
 			break;
-		case MENU_PGO:
+		case MENU_PGA:
 			SetRegisterValue(PGO_REGISTER_SPEC, gSubMenuSelection);
+			break;
+#endif
+#ifdef EXTENDED_QRP
+		case MENU_PA_BIAS:
+			gCurrentVfo->TXP_CalculatedSetting = gSubMenuSelection;
 			break;
 #endif
 		case MENU_SQL:
@@ -895,8 +905,13 @@ void MENU_ShowCurrentSetting(void)
 		case MENU_MIXER:
 			gSubMenuSelection = GetRegisterValue(MIXER_REGISTER_SPEC);
 			break;
-		case MENU_PGO:
+		case MENU_PGA:
 			gSubMenuSelection = GetRegisterValue(PGO_REGISTER_SPEC);
+			break;
+#endif
+#ifdef EXTENDED_QRP
+		case MENU_PA_BIAS:
+			gSubMenuSelection = gCurrentVfo->TXP_CalculatedSetting;
 			break;
 #endif
 		case MENU_SQL:
